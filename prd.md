@@ -1,12 +1,12 @@
-# ROOTS AI — Product Requirements Document
+# LOKVAANI AI — Product Requirements Document
 
 ## 1. Product Overview
 
-**ROOTS AI** is an AI-powered indigenous knowledge preservation and discovery platform, initially focused on Uttarakhand.
+**LOKVAANI AI** is an AI-powered indigenous knowledge preservation and discovery platform, initially focused on Uttarakhand.
 
 The platform helps communities, knowledge holders, students, researchers, NGOs, and government organizations document, discover, understand, verify, and preserve traditional knowledge that may otherwise disappear.
 
-ROOTS AI uses AI to reduce the manual effort required for documentation while keeping communities in control of their knowledge, ownership, access, and publication.
+LOKVAANI AI uses AI to reduce the manual effort required for documentation while keeping communities in control of their knowledge, ownership, access, and publication.
 
 **Tagline:**
 Preserve the Past. Understand It. Build the Future.
@@ -43,7 +43,7 @@ Existing digital platforms generally focus on storing cultural content rather th
 * Connect traditional knowledge with scientific research
 * Respect community ownership and access restrictions
 
-ROOTS AI aims to solve this problem.
+LOKVAANI AI aims to solve this problem.
 
 ---
 
@@ -157,7 +157,7 @@ Organizations can:
 
 ## 5.6 Government Organizations
 
-Government organizations can use ROOTS AI to:
+Government organizations can use LOKVAANI AI to:
 
 * Identify disappearing cultural practices
 * Prioritize preservation programs
