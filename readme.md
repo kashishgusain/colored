@@ -1,8 +1,8 @@
-# ROOTS AI
+# LOKVAANI AI
 
-### Preserve the Past. Understand It. Build the Future.
+### Preserve the Past. Understand It. Build the Future
 
-ROOTS AI is an **AI-powered indigenous knowledge and cultural heritage platform** that preserves disappearing traditional skills, knowledge, practices and local products while giving communities control over how their knowledge is shared.
+LOKVAANI AI is an **AI-powered indigenous knowledge and cultural heritage platform** that preserves disappearing traditional skills, knowledge, practices and local products while giving communities control over how their knowledge is shared.
 
 The initial focus is **Uttarakhand**, with a vision to expand across India.
 
@@ -31,7 +31,7 @@ At the same time, younger generations, researchers and organizations have diffic
 
 ## Our Solution
 
-ROOTS AI allows people to **record traditional knowledge through video, audio, images or documents**.
+LOKVAANI AI allows people to **record traditional knowledge through video, audio, images or documents**.
 
 AI automatically converts the content into structured, searchable knowledge.
 
@@ -79,7 +79,7 @@ Categories can include:
 
 Not all knowledge should be public.
 
-ROOTS AI provides access levels such as:
+LOKVAANI AI provides access levels such as:
 
 **Public | Registered | Community Only | Research | Restricted**
 
@@ -140,7 +140,7 @@ This creates a connection between:
 
 ## Key Stakeholders
 
-ROOTS AI connects:
+LOKVAANI AI connects:
 
 * Local Communities
 * Knowledge Holders
@@ -191,8 +191,8 @@ The first version will focus on:
 
 ## Vision
 
-ROOTS AI aims to become a **digital ecosystem for India's indigenous knowledge**, where traditional knowledge is not only preserved but also **protected, discovered, learned, researched and revived**.
+LOKVAANI AI aims to become a **digital ecosystem for India's indigenous knowledge**, where traditional knowledge is not only preserved but also **protected, discovered, learned, researched and revived**.
 
 ### One-line definition
 
-> **ROOTS AI uses AI to preserve India's disappearing indigenous knowledge while keeping communities at the center of ownership, access and cultural decision-making.**
+> **LOKVAANI AI uses AI to preserve India's disappearing indigenous knowledge while keeping communities at the center of ownership, access and cultural decision-making.**
