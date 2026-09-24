@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Knowledge Risk Dashboard — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Knowledge Risk Dashboard</p>
+      <h2>Practices at risk of disappearing</h2>
+      <p class="text-muted">A transparent, explainable indicator — not a scientific
+        measurement. Practitioner decline (25%), youth participation (20%), documentation gap
+        (20%), practice frequency decline (15%), geographic concentration (10%), low
+        transmission (10%).</p>
+    </div>
+
+    {% if not risks %}
+      <div class="empty-state"><h3>No risk assessments yet.</h3><p>Run <code>seed_data.py</code> to load sample assessments.</p></div>
+    {% endif %}
+
+    {% for r in risks %}
+    <details class="risk-detail" {% if loop.first %}open{% endif %}>
+      <summary style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; list-style:none;">
+        <span>
+          <strong>{{ r.practice_title }}</strong>
+          <span class="text-muted"> — {{ r.district_name }}{% if r.category_name %} · {{ r.category_name }}{% endif %}</span>
+        </span>
+        <span class="badge badge-risk-{{ r.band }}">{{ r.band }} · {{ r.score }}/100</span>
+      </summary>
+
+      <div style="margin-top:1rem; display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+        <div><span class="text-muted">Practitioners</span><br><strong>{{ r.practitioners }}</strong></div>
+        <div><span class="text-muted">Under 35</span><br><strong>{{ r.young_practitioners }}</strong></div>
+      </div>
+
+      {% if r.notes %}<p style="margin-top:1rem;">{{ r.notes }}</p>{% endif %}
+
+      <h4 style="margin-top:1.5rem;">Why this score</h4>
+      {% set b = breakdowns[r.id] %}
+      <div class="risk-bar-row"><span>Practitioner decline</span><div class="risk-bar-track"><div class="risk-bar-fill" style="width:{{ b.practitioner_decline }}%;"></div></div><span>{{ b.practitioner_decline }}</span></div>
+      <div class="risk-bar-row"><span>Low youth participation</span><div class="risk-bar-track"><div class="risk-bar-fill" style="width:{{ b.youth_participation }}%;"></div></div><span>{{ b.youth_participation }}</span></div>
+      <div class="risk-bar-row"><span>Documentation gap</span><div class="risk-bar-track"><div class="risk-bar-fill" style="width:{{ b.documentation_gap }}%;"></div></div><span>{{ b.documentation_gap }}</span></div>
+      <div class="risk-bar-row"><span>Practice frequency decline</span><div class="risk-bar-track"><div class="risk-bar-fill" style="width:{{ b.frequency_decline }}%;"></div></div><span>{{ b.frequency_decline }}</span></div>
+      <div class="risk-bar-row"><span>Geographic concentration</span><div class="risk-bar-track"><div class="risk-bar-fill" style="width:{{ b.geographic_concentration }}%;"></div></div><span>{{ b.geographic_concentration }}</span></div>
+      <div class="risk-bar-row"><span>Low transmission to youth</span><div class="risk-bar-track"><div class="risk-bar-fill" style="width:{{ b.low_transmission }}%;"></div></div><span>{{ b.low_transmission }}</span></div>
+
+      <h4 style="margin-top:1.5rem;">Recommended preservation actions</h4>
+      <ul class="tag-list">
+        {% for action in recommendations[r.band] %}<li>{{ action }}</li>{% endfor %}
+      </ul>
+    </details>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

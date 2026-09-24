@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ district.name }} — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <p class="eyebrow"><a href="{{ url_for('dashboard.explore') }}">&larr; Explore Uttarakhand</a></p>
+    <h1>{{ district.name }}</h1>
+    <p class="lede">{{ district.description }}</p>
+
+    <h3 style="margin-top:2.5rem;">Knowledge records</h3>
+    {% if records %}
+      <ul class="row-list">
+        {% for r in records %}
+        <li><a class="row-link" href="{{ url_for('knowledge.view', knowledge_id=r.knowledge_id) }}">
+          <div>
+            <div class="row-title">{{ r.title }}</div>
+            <div class="row-meta">{{ r.category_name }}{% if r.community %} · {{ r.community }}{% endif %}</div>
+          </div>
+          <span class="badge badge-{{ 'public' if r.access_level == 'public' else 'community' }}">{{ 'Public' if r.access_level == 'public' else 'Community only' }}</span>
+        </a></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <h3>We haven't documented this yet.</h3>
+        <p>Be the first to help preserve knowledge from {{ district.name }}.</p>
+        <a class="btn btn-accent" href="{{ url_for('upload.record_knowledge') }}">Help preserve it</a>
+      </div>
+    {% endif %}
+
+    {% if risks %}
+    <h3 style="margin-top:2.5rem;">Practices at risk here</h3>
+    <ul class="row-list">
+      {% for r in risks %}
+      <li>
+        <div>
+          <div class="row-title">{{ r.practice_title }}</div>
+          <div class="row-meta">{{ r.practitioners }} known practitioners · {{ r.young_practitioners }} under 35</div>
+        </div>
+        <span class="badge badge-risk-{{ r.band }}">{{ r.band }} · {{ r.score }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

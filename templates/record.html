@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ record.title }} — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+
+    <div class="record-header">
+      <span class="kid">{{ record.knowledge_id }}</span>
+      <span class="badge badge-status-{{ record.status }}">{{ record.status.replace('_', ' ') }}</span>
+      <span class="badge badge-{{ 'public' if record.access_level == 'public' else 'community' }}">
+        {{ 'Public' if record.access_level == 'public' else 'Community only' }}
+      </span>
+      {% if record.is_demo_ai %}<span class="badge badge-demo">AI ran in demo mode</span>{% endif %}
+    </div>
+
+    <h1>{{ record.title }}</h1>
+    <p class="text-muted">{{ record.district_name }}{% if record.community %} · {{ record.community }}{% endif %}{% if record.category_name %} · {{ record.category_name }}{% endif %}</p>
+
+    {% if is_owner or can_review %}
+      <a class="btn btn-outline" href="{{ url_for('knowledge.review', knowledge_id=record.knowledge_id) }}">Edit / review</a>
+    {% endif %}
+
+    <div class="record-grid">
+      <div>
+        <h3>Summary</h3>
+        <p>{{ record.summary or "No summary yet." }}</p>
+
+        <h3>Transcript</h3>
+        <div class="transcript-tabs">
+          <button class="active" data-target="pane-en">English</button>
+          <button data-target="pane-orig">Original ({{ record.language or "source" }})</button>
+        </div>
+        <div id="pane-en" class="transcript-pane active">{{ record.translation_en or "Translation not available." }}</div>
+        <div id="pane-orig" class="transcript-pane">{{ record.original_transcript or "Transcript not available." }}</div>
+
+        {% if steps %}
+        <h3 style="margin-top:2rem;">Steps</h3>
+        <ol>{% for s in steps %}<li>{{ s }}</li>{% endfor %}</ol>
+        {% endif %}
+
+        {% if record.cultural_significance %}
+        <h3>Cultural significance</h3>
+        <p>{{ record.cultural_significance }}</p>
+        {% endif %}
+
+        {% if record.historical_context %}
+        <h3>Historical context</h3>
+        <p>{{ record.historical_context }}</p>
+        {% endif %}
+      </div>
+
+      <div>
+        {% if materials %}
+        <div class="side-panel">
+          <h4>Materials</h4>
+          <ul class="tag-list">{% for m in materials %}<li>{{ m }}</li>{% endfor %}</ul>
+        </div>
+        {% endif %}
+        {% if tools %}
+        <div class="side-panel">
+          <h4>Tools</h4>
+          <ul class="tag-list">{% for t in tools %}<li>{{ t }}</li>{% endfor %}</ul>
+        </div>
+        {% endif %}
+        {% if keywords %}
+        <div class="side-panel">
+          <h4>Keywords</h4>
+          <div class="chip-row">{% for k in keywords %}<span class="chip">{{ k }}</span>{% endfor %}</div>
+        </div>
+        {% endif %}
+        <div class="side-panel">
+          <h4>Contributed by</h4>
+          <p style="margin:0;">{{ record.contributor_name or "Unknown" }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

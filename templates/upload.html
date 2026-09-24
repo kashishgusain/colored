@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Record My Knowledge — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Record my knowledge</p>
+      <h2>Share what you know, in your own words.</h2>
+      <p class="text-muted">Upload a short video or audio recording of yourself talking about a
+        traditional practice. Speak naturally, in whatever language is comfortable. AI will
+        take care of the rest — you'll get a chance to review and correct everything before it
+        is shared.</p>
+    </div>
+
+    <div class="form-card">
+      <form method="post" enctype="multipart/form-data">
+        <div class="field">
+          <label for="media">Your recording</label>
+          <input type="file" id="media" name="media" accept=".mp4,.mov,.webm,.mp3,.wav,.m4a" required>
+          <div class="hint">MP4, MOV, WebM, MP3, WAV or M4A. Keep it under a few minutes for a faster turnaround.</div>
+        </div>
+
+        <div class="field">
+          <label for="district_id">Which district is this from?</label>
+          <select id="district_id" name="district_id" required>
+            <option value="">Choose a district</option>
+            {% for d in districts %}
+              <option value="{{ d.id }}">{{ d.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="community">Community (optional)</label>
+          <input type="text" id="community" name="community" placeholder="e.g. Bhotiya Weavers Collective">
+          <div class="hint">Leave blank if this knowledge isn't tied to a specific community.</div>
+        </div>
+
+        <fieldset>
+          <legend>Who should be able to see this?</legend>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="access_level" value="public" checked>
+              <span><strong>Public</strong> — anyone can view this once it's verified.</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="access_level" value="community_only">
+              <span><strong>Community only</strong> — only verified members of your community, and stewards, can view it.</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <button class="btn btn-accent btn-large btn-block" type="submit">Upload and let AI understand it</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

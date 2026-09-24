@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Review {{ record.knowledge_id or "recording" }} — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">AI generated documentation</p>
+      <h2>Review what LOKVAANI AI understood</h2>
+      <p class="text-muted">Correct anything that's wrong — accents, local terms, and
+        translation mistakes happen. Nothing here is final until it's saved and a Community
+        Steward approves it.</p>
+    </div>
+
+    {% if record.error_message %}
+    <div class="notice danger">
+      <strong>Steward feedback:</strong> {{ record.error_message }}
+    </div>
+    {% endif %}
+
+    {% if record.is_demo_ai %}
+    <div class="notice">This record was processed in demo mode (no live API key configured), so the fields below are placeholders — fill them in manually.</div>
+    {% endif %}
+
+    <div class="record-grid">
+      <div>
+        <form method="post" class="form-card" style="max-width:none;">
+          <div class="field">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="{{ record.title or '' }}" required>
+          </div>
+          <div class="field">
+            <label for="translation_en">English translation</label>
+            <textarea id="translation_en" name="translation_en" rows="6">{{ record.translation_en or '' }}</textarea>
+          </div>
+          <div class="field">
+            <label for="summary">Summary</label>
+            <textarea id="summary" name="summary" rows="3">{{ record.summary or '' }}</textarea>
+          </div>
+          <div class="field">
+            <label for="materials">Materials <span class="hint">(one per line)</span></label>
+            <textarea id="materials" name="materials" rows="4">{{ materials }}</textarea>
+          </div>
+          <div class="field">
+            <label for="tools">Tools <span class="hint">(one per line)</span></label>
+            <textarea id="tools" name="tools" rows="3">{{ tools }}</textarea>
+          </div>
+          <div class="field">
+            <label for="steps">Steps <span class="hint">(one per line, in order)</span></label>
+            <textarea id="steps" name="steps" rows="6">{{ steps }}</textarea>
+          </div>
+          <div class="field">
+            <label for="cultural_significance">Cultural significance</label>
+            <textarea id="cultural_significance" name="cultural_significance" rows="3">{{ record.cultural_significance or '' }}</textarea>
+          </div>
+          <div class="field">
+            <label for="historical_context">Historical context</label>
+            <textarea id="historical_context" name="historical_context" rows="3">{{ record.historical_context or '' }}</textarea>
+          </div>
+          <button class="btn btn-primary btn-large" type="submit">Save changes</button>
+        </form>
+      </div>
+
+      <div>
+        <div class="side-panel">
+          <h4>Original transcript</h4>
+          <p style="white-space:pre-wrap; font-size:0.92rem;">{{ record.original_transcript or "Not available." }}</p>
+          <p class="hint">Language detected: {{ record.language or "unknown" }}. The original is never overwritten.</p>
+        </div>
+
+        {% if current_user and current_user.role in ("steward", "admin") %}
+        <div class="side-panel">
+          <h4>Community Steward actions</h4>
+          <p class="text-muted" style="font-size:0.9rem;">Status: <span class="badge badge-status-{{ record.status }}">{{ record.status.replace('_',' ') }}</span></p>
+          {% if record.status == "ai_extracted" %}
+            <form method="post" action="{{ url_for('knowledge.approve', knowledge_id=record.knowledge_id) }}" style="margin-bottom:0.75rem;">
+              <button class="btn btn-primary btn-block" type="submit">Approve — Mark Community Verified</button>
+            </form>
+            <form method="post" action="{{ url_for('knowledge.request_changes', knowledge_id=record.knowledge_id) }}">
+              <textarea name="note" rows="2" placeholder="What needs to change?"></textarea>
+              <button class="btn btn-ghost btn-block" style="margin-top:0.5rem;" type="submit">Request corrections</button>
+            </form>
+          {% else %}
+            <p class="text-muted">No action needed right now.</p>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

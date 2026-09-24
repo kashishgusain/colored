@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}LOKVAANI AI — Preserve the Past. Understand It. Build the Future.{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>The knowledge of a place lives in its people.</h1>
+      <p class="lede">LOKVAANI AI preserves Uttarakhand's disappearing traditional knowledge by
+        turning voices, videos and lived experience into searchable digital memory — while
+        keeping communities in control of how it's shared.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary btn-large" href="{{ url_for('dashboard.explore') }}">Explore Uttarakhand</a>
+        <a class="btn btn-accent btn-large" href="{{ url_for('upload.record_knowledge') }}">Record My Knowledge</a>
+        <a class="btn btn-outline btn-large" href="{{ url_for('search.ask') }}">Ask LOKVAANI AI</a>
+      </div>
+    </div>
+    <div class="stat-strip">
+      <div class="stat-row"><span class="num">{{ stats.verified }}</span><span class="label">Community-verified knowledge records</span></div>
+      <div class="stat-row"><span class="num">{{ stats.districts }}</span><span class="label">Districts mapped</span></div>
+      <div class="stat-row"><span class="num">{{ stats.categories }}</span><span class="label">Knowledge categories</span></div>
+      <div class="stat-row"><span class="num">{{ stats.at_risk }}</span><span class="label">Practices flagged High or Critical risk</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">The problem</p>
+      <h2>Some knowledge disappears without ever being written down.</h2>
+      <p class="text-muted">A farming method, a seed-preservation trick, a weaving pattern, a
+        way of managing water — these often exist only in one person's memory. When that
+        person is gone, so is the knowledge, unless someone records it in time.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2>Record → Understand → Verify → Preserve → Discover</h2>
+    </div>
+    <ol class="flow-list">
+      <li><div><h3>Record</h3><p>A knowledge holder records themselves speaking naturally, in their own language.</p></div></li>
+      <li><div><h3>Understand</h3><p>AI transcribes, translates, and organizes the recording into structured knowledge.</p></div></li>
+      <li><div><h3>Verify</h3><p>The knowledge holder reviews the AI's work, then a Community Steward confirms it.</p></div></li>
+      <li><div><h3>Preserve</h3><p>The record gets a permanent Knowledge ID and enters the searchable archive.</p></div></li>
+      <li><div><h3>Discover</h3><p>Anyone with permission can find it through search or by asking LOKVAANI AI directly.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+{% if featured %}
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Recently preserved</p>
+      <h2>Knowledge at risk, now remembered</h2>
+    </div>
+    <ul class="row-list">
+      {% for r in featured %}
+      <li><a class="row-link" href="{{ url_for('knowledge.view', knowledge_id=r.knowledge_id) }}">
+        <div>
+          <div class="row-title">{{ r.title }}</div>
+          <div class="row-meta">{{ r.district_name }} · {{ r.category_name }}</div>
+        </div>
+        <span class="kid">{{ r.knowledge_id }}</span>
+      </a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Community control</p>
+      <h2>AI assists. The community decides.</h2>
+      <p class="text-muted">AI never has the final word on whether a tradition is authentic or
+        how it should be shared. Every record shows whether it's AI Extracted, Community
+        Verified, or Expert Verified — and some knowledge stays visible only to the community
+        it belongs to.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section center">
+  <div class="container">
+    <h2>Help preserve a voice before it disappears.</h2>
+    <a class="btn btn-accent btn-large" href="{{ url_for('upload.record_knowledge') }}">Record My Knowledge</a>
+  </div>
+</section>
+
+{% endblock %}

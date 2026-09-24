@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Protected knowledge — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <div class="access-denied">
+      {% if reason == "community_only" %}
+        <div class="icon">&#128274;</div>
+        <h2>This knowledge belongs to a protected community.</h2>
+        <p class="text-muted">Access is limited to verified members of {{ record.community or "this community" }}, and to Community Stewards.</p>
+        {% if current_user %}
+          <a class="btn btn-primary" href="{{ url_for('auth.register') }}">Update your community on your profile</a>
+        {% else %}
+          <a class="btn btn-primary" href="{{ url_for('auth.login') }}">Log in</a>
+        {% endif %}
+      {% elif reason == "pending_review" %}
+        <div class="icon">&#8987;</div>
+        <h2>This knowledge is waiting for community verification.</h2>
+        <p class="text-muted">Only the knowledge holder and Community Stewards can view it until then.</p>
+      {% else %}
+        <div class="icon">&#9881;</div>
+        <h2>This recording is still being processed.</h2>
+        <p class="text-muted">Only its contributor can view it right now.</p>
+      {% endif %}
+      <p style="margin-top:1.5rem;"><a href="{{ url_for('dashboard.explore') }}">&larr; Back to Explore Uttarakhand</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

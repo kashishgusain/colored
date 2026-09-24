@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}LOKVAANI AI{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="wordmark" href="{{ url_for('index') }}">LOKVAANI AI <span class="tag">Uttarakhand</span></a>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+    <nav class="nav-links">
+      <a href="{{ url_for('dashboard.explore') }}">Explore Uttarakhand</a>
+      <a href="{{ url_for('search.search_page') }}">Search</a>
+      <a href="{{ url_for('search.ask') }}">Ask LOKVAANI AI</a>
+      <a href="{{ url_for('dashboard.risk_dashboard') }}">Risk Dashboard</a>
+      {% if current_user %}
+        <a href="{{ url_for('upload.record_knowledge') }}">Record My Knowledge</a>
+        <a href="{{ url_for('auth.logout') }}">Log out ({{ current_user.username }})</a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}">Log in</a>
+        <a class="btn btn-accent" href="{{ url_for('auth.register') }}">Get started</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+{% if ai_demo_mode %}
+<div class="notice" style="border-radius:0; border-left:none; border-top:4px solid var(--marigold); margin:0;">
+  <div class="container">
+    <strong>Demo mode:</strong> no <code>GROQ_API_KEY</code> is configured, so AI stages return
+    clearly-labeled placeholder output instead of live results. Add a free key in <code>.env</code>
+    to run the real pipeline.
+  </div>
+</div>
+{% endif %}
+
+<main>
+  <div class="container" style="padding-top:1.25rem;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>The voice belongs to the people. The AI helps preserve it. The community decides how it is shared.</div>
+    <div>LOKVAANI AI — hackathon prototype, Uttarakhand pilot</div>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

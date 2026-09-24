@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.env
+lokvaani.db
+uploads/*
+!uploads/.gitkeep
+server.log
+server.pid
+venv/
+.venv/

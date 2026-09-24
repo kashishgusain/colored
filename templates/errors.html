@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section center" style="border-top:none;">
+  <div class="container">
+    <h2>{{ code }}</h2>
+    <p class="text-muted">{{ message }}</p>
+    <a class="btn btn-outline" href="{{ url_for('index') }}">Back to home</a>
+  </div>
+</section>
+{% endblock %}

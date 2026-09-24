@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Processing your recording — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <div class="form-card" data-status-url="{{ url_for('upload.status_json', record_id=record.id) }}" data-record-url-base="/knowledge/">
+      <h2>AI is understanding your recording...</h2>
+      <p class="text-muted" data-status-message>This usually takes a minute or two.</p>
+
+      <ul class="progress-list">
+        <li data-step="uploading" class="done"><span class="dot"></span> Uploading</li>
+        <li data-step="transcribing" class="active"><span class="dot"></span> Transcribing your speech</li>
+        <li data-step="extracting"><span class="dot"></span> Translating &amp; organizing knowledge</li>
+        <li data-step="indexing"><span class="dot"></span> Making it searchable</li>
+      </ul>
+
+      <a class="btn btn-primary" style="margin-top:1.5rem;" href="#" data-review-link disabled aria-disabled="true">
+        Review AI-generated documentation
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Search — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Search</p>
+      <h2>Find knowledge by meaning, not just keywords</h2>
+    </div>
+
+    <form method="get" class="form-card" style="max-width:none; margin-bottom:2rem;">
+      <div class="field">
+        <label for="q">What are you looking for?</label>
+        <input type="text" id="q" name="q" value="{{ query }}" placeholder="e.g. how did farmers preserve seeds in Tehri?">
+      </div>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <div class="field" style="flex:1; min-width:180px;">
+          <label for="district_id">District</label>
+          <select id="district_id" name="district_id">
+            <option value="">All districts</option>
+            {% for d in districts %}<option value="{{ d.id }}" {% if selected_district == d.id|string %}selected{% endif %}>{{ d.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field" style="flex:1; min-width:180px;">
+          <label for="category_id">Category</label>
+          <select id="category_id" name="category_id">
+            <option value="">All categories</option>
+            {% for c in categories %}<option value="{{ c.id }}" {% if selected_category == c.id|string %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+
+    {% if query %}
+      {% if results %}
+        <ul class="row-list">
+          {% for r in results %}
+          <li><a class="row-link" href="{{ url_for('knowledge.view', knowledge_id=r.knowledge_id) }}">
+            <div>
+              <div class="row-title">{{ r.title }}</div>
+              <div class="row-meta">{{ r.district_name }} · {{ r.category_name }} · <span class="badge badge-status-{{ r.status }}" style="margin-left:0.3rem;">{{ r.status.replace('_',' ') }}</span></div>
+            </div>
+            <span class="kid">{{ r.knowledge_id }}</span>
+          </a></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <h3>We haven't documented this yet.</h3>
+          <p>Nothing matched your search within what you're able to see.</p>
+          <a class="btn btn-accent" href="{{ url_for('upload.record_knowledge') }}">Help preserve it</a>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

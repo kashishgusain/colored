@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Explore Uttarakhand — LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Explore Uttarakhand</p>
+      <h2>Thirteen districts, each with its own knowledge to preserve</h2>
+    </div>
+    <ul class="row-list">
+      {% for d in districts %}
+      <li><a class="row-link" href="{{ url_for('dashboard.district_detail', slug=d.slug) }}">
+        <div>
+          <div class="row-title">{{ d.name }}</div>
+          <div class="row-meta">{{ d.description }}</div>
+        </div>
+        <span class="kid">{{ d.record_count }} record{{ 's' if d.record_count != 1 else '' }}</span>
+      </a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}

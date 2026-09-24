@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Ask LOKVAANI AI{% endblock %}
+{% block content %}
+<section class="section" style="border-top:none;">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Ask LOKVAANI AI</p>
+      <h2>Ask a question about traditional knowledge in Uttarakhand</h2>
+      <p class="text-muted">Answers are grounded only in Community Verified records you're
+        permitted to see. If LOKVAANI doesn't have enough verified information, it will say so
+        rather than guess.</p>
+    </div>
+
+    <form method="post" class="form-card" style="max-width:none;">
+      <div class="field">
+        <label for="question">Your question</label>
+        <textarea id="question" name="question" rows="3" placeholder="e.g. Tehri mein purane time mein farmers seeds kaise preserve karte the?">{{ question }}</textarea>
+      </div>
+      <button class="btn btn-primary btn-large" type="submit">Ask</button>
+    </form>
+
+    {% if error %}
+      <div class="notice danger">{{ error }}</div>
+    {% endif %}
+
+    {% if answer %}
+      <div class="ask-answer">
+        {% if is_demo %}<span class="badge badge-demo">Demo mode answer</span>{% endif %}
+        <p style="white-space:pre-wrap;">{{ answer }}</p>
+        {% if sources %}
+        <ul class="ask-sources">
+          {% for s in sources %}
+          <li><a href="{{ url_for('knowledge.view', knowledge_id=s.knowledge_id) }}">{{ s.knowledge_id }}</a>
+            — {{ s.title }} <span class="badge badge-status-{{ s.status }}">{{ s.status.replace('_',' ') }}</span></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
