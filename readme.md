@@ -23,7 +23,7 @@ python app.py
 
 Open http://127.0.0.1:5000
 
-Demo accounts (created by `seed_data.py`):
+Demo accounts (created by `seed_data.py`)....
 
 | Username | Password    | Role    | Community                    |
 |----------|-------------|---------|-------------------------------|
