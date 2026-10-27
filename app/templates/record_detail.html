@@ -1,0 +1,39 @@
+{% extends "base.html" %}{% from "_macros.html" import status_badge, record_card %}
+{% block title %}{{ record.title }} · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5">
+  {% if is_preview %}<div class="notice notice-danger mb-4"><strong>Not public.</strong> Only you and reviewers can see this record. Status: {{ status_badge(record) }} {{ 'Private archive.' if not record.is_public }}</div>{% endif %}
+  <p class="mb-2"><a href="{{ url_for('search.explore') }}">&larr; Explore heritage</a></p>
+  <div class="row g-5">
+    <article class="col-lg-8 record-body">
+      <div class="text-muted-2 mb-1">{{ record.category.name }}</div>
+      <h1>{{ record.title }}</h1>
+      <p class="lead">{{ record.description }}</p>
+      {% if record.primary_media %}{% set m = record.primary_media %}
+        {% if m.kind == 'video' %}<video controls preload="metadata" src="{{ url_for('search.serve_media', asset_id=m.id) }}"></video>
+        {% else %}<audio controls preload="metadata" src="{{ url_for('search.serve_media', asset_id=m.id) }}"></audio>{% endif %}{% endif %}
+      {% for m in record.media if m.kind == 'photo' %}<img class="img-fluid rounded mt-3" src="{{ url_for('search.serve_media', asset_id=m.id) }}" alt="Photograph supplied with {{ record.title }}">{% endfor %}
+      {% if record.summary %}<h2>Summary</h2><p>{{ record.summary }}</p>{% endif %}
+      {% if record.body_text %}<h2>Text</h2><div class="transcript">{{ record.body_text }}</div>{% endif %}
+      {% if record.primary_media %}
+        {% if record.transcript_text %}<h2>Transcript</h2>
+          {% if record.language in ('garhwali','kumaoni','jaunsari') %}<div class="notice mb-2">Speech models do not officially support {{ record.language_label }}. This transcript was checked by community reviewers but may still contain errors.</div>{% endif %}
+          <div class="transcript">{{ record.transcript_text }}</div>{% endif %}
+        {% for lang, label in (('hi','Hindi'),('en','English')) %}{% set t = record.translation_for(lang) %}{% if t and t.text %}<h2>{{ label }} translation</h2><div class="transcript">{{ t.text }}</div>{% endif %}{% endfor %}
+      {% endif %}
+    </article>
+    <aside class="col-lg-4">
+      <div class="panel mb-4"><h2 class="h5">Record details</h2>
+        <dl class="mb-0 small">
+          <dt>Language</dt><dd>{{ record.language_label }}</dd>
+          <dt>Place</dt><dd>{{ record.village ~ ', ' if record.village }}{{ record.district or 'Uttarakhand' }}</dd>
+          <dt>Shared by</dt><dd>{{ record.attribution_label }}</dd>
+          <dt>Verification</dt><dd>{% if record.status == Status.APPROVED %}Verified by {{ record.verified_by.display_name if record.verified_by else 'a Community Steward' }}{% if record.approved_at %} on {{ record.approved_at|dt('%d %b %Y') }}{% endif %}{% else %}Not verified yet{% endif %}</dd>
+          <dt>Tags</dt><dd>{% for t in record.tag_list %}<span class="pill">{{ t }}</span>{% else %}None{% endfor %}</dd>
+        </dl></div>
+      {% if related %}<h2 class="h5">Related records</h2><div class="d-grid gap-3">{% for r in related %}{{ record_card(r) }}{% endfor %}</div>{% endif %}
+      <p class="mt-4"><a class="btn btn-outline-primary w-100" href="{{ url_for('chatbot.page') }}">Ask LOKVAANI AI about this</a></p>
+    </aside>
+  </div>
+</div>
+{% endblock %}

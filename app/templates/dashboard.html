@@ -1,0 +1,36 @@
+{% extends "base.html" %}{% from "_macros.html" import status_badge %}
+{% block title %}Your dashboard · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div><h1 class="h2 mb-1">Hello, {{ current_user.display_name }}</h1><p class="text-muted-2 mb-0">{{ current_user.role_label }}</p></div>
+    <div class="d-flex gap-2">
+      {% if current_user.can_contribute %}<a class="btn btn-primary" href="{{ url_for('contributions.new') }}">Add a contribution</a>{% endif %}
+      <a class="btn btn-outline-primary" href="{{ url_for('auth.profile') }}">Profile</a>
+    </div>
+  </div>
+  {% if pending_reviews is not none %}
+  <div class="notice mb-4"><strong>{{ pending_reviews }}</strong> {{ 'submission is' if pending_reviews == 1 else 'submissions are' }} waiting for review. <a href="{{ url_for('moderation.dashboard') }}">Open the review queue</a></div>
+  {% endif %}
+  {% if not current_user.can_contribute %}
+  <div class="empty"><h2 class="h4">You can explore and ask questions</h2><p>To add recordings or stories, become a contributor from your profile.</p><a class="btn btn-gold" href="{{ url_for('auth.profile') }}">Go to profile</a></div>
+  {% else %}
+  <div class="row g-3 mb-4">
+    {% for key in ['draft','processing','pending_review','needs_revision','approved','rejected'] %}
+    <div class="col-6 col-md-2"><div class="stat-tile"><div class="num">{{ by_status.get(key, 0) }}</div><div class="lbl">{{ Status.LABELS[key] }}</div></div></div>{% endfor %}
+  </div>
+  <h2 class="h4">Your contributions</h2>
+  {% if records %}
+  <div class="table-responsive"><table class="table table-lok align-middle">
+    <thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Visibility</th><th>Updated</th><th></th></tr></thead>
+    <tbody>{% for r in records %}<tr>
+      <td>{{ r.title }}</td><td>{{ r.content_type|capitalize }}</td><td>{{ status_badge(r) }}</td>
+      <td>{{ 'Public' if r.is_public else 'Private' }}</td><td>{{ r.updated_at|dt('%d %b %Y') }}</td>
+      <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('contributions.manage', record_id=r.id) }}">Open</a></td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}
+  <div class="empty"><h3>Nothing shared yet</h3><p>Record an elder telling a story, or write down a recipe. It stays a private draft until you submit it and a Steward approves it.</p><a class="btn btn-primary" href="{{ url_for('contributions.new') }}">Start your first contribution</a></div>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

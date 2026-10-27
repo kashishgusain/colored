@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% from "_macros.html" import pager %}
+{% block title %}Users · Admin{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <p><a href="{{ url_for('admin.dashboard') }}">&larr; Admin</a></p><h1 class="mb-3">Users and roles</h1>
+  <form class="row g-2 mb-3" method="get"><div class="col-md-5"><label class="visually-hidden" for="q">Search</label><input class="form-control" id="q" name="q" value="{{ q }}" placeholder="Search name, username or email"></div>
+    <div class="col-md-3"><label class="visually-hidden" for="role">Role</label><select class="form-select" id="role" name="role"><option value="">All roles</option>{% for r in Role.ALL %}<option value="{{ r }}" {{ 'selected' if role_filter == r }}>{{ Role.LABELS[r] }}</option>{% endfor %}</select></div>
+    <div class="col-auto"><button class="btn btn-primary" type="submit">Filter</button></div></form>
+  <div class="table-responsive"><table class="table table-lok align-middle"><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th></th></tr></thead><tbody>
+    {% for u in pag.items %}<tr><td>{{ u.display_name }}<br><span class="small text-muted-2">@{{ u.username }}</span></td><td>{{ u.email }}</td>
+      <td>{% if u.id == current_user.id %}{{ u.role_label }} (you){% else %}<form method="post" action="{{ url_for('admin.set_role', user_id=u.id) }}" class="d-flex gap-1"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <select class="form-select form-select-sm" name="role" aria-label="Role for {{ u.username }}">{% for r in Role.ALL %}<option value="{{ r }}" {{ 'selected' if u.role == r }}>{{ Role.LABELS[r] }}</option>{% endfor %}</select><button class="btn btn-sm btn-outline-primary" type="submit">Set</button></form>{% endif %}</td>
+      <td>{{ 'Active' if u.is_active_account else 'Disabled' }}</td><td>{{ u.created_at|dt('%d %b %Y') }}</td>
+      <td>{% if u.id != current_user.id %}<form method="post" action="{{ url_for('admin.set_active', user_id=u.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-primary" type="submit">{{ 'Disable' if u.is_active_account else 'Enable' }}</button></form>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {{ pager(pag, 'admin.users', q=q, role=role_filter) }}
+</div>
+{% endblock %}

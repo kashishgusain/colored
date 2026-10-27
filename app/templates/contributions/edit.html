@@ -1,0 +1,32 @@
+{% extends "base.html" %}{% from "_macros.html" import field %}
+{% block title %}Review and correct · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:900px">
+  <p class="mb-2"><a href="{{ url_for('contributions.manage', record_id=record.id) }}">&larr; Back to record</a></p>
+  <h1 class="h2">Review and correct</h1>
+  {% if record.status == Status.APPROVED %}<div class="notice mb-3">This record is approved. If you save changes it returns to review and is hidden from public search until a steward approves it again.</div>{% endif %}
+  {% set ai = record.ai_metadata %}
+  <form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="panel mb-4">
+      {{ field(form.title) }}{{ field(form.description) }}
+      <div class="row"><div class="col-md-6">{{ field(form.category_id) }}</div><div class="col-md-6">{{ field(form.language) }}</div></div>
+      <div class="row"><div class="col-md-6">{{ field(form.district) }}</div><div class="col-md-6">{{ field(form.village) }}</div></div>
+      {{ field(form.tags) }}
+      {% if record.ai_suggested_tags %}<p class="small text-muted-2">Suggested tags: {{ record.ai_suggested_tags }} <button class="btn btn-outline-primary btn-sm" type="button" data-ai-action="append-tags" data-ai-value="{{ record.ai_suggested_tags }}">Add suggestions</button></p>{% endif %}
+      {{ field(form.summary) }}
+      {% if ai.suggested_summary %}<p class="small text-muted-2">AI summary suggestion: {{ ai.suggested_summary }} <button class="btn btn-outline-primary btn-sm" type="button" data-ai-action="use-summary" data-ai-value="{{ ai.suggested_summary }}">Use suggestion</button></p>{% endif %}
+      {% if ai.suggested_category %}<p class="small text-muted-2">AI category suggestion: {{ ai.suggested_category.name }} <button class="btn btn-outline-primary btn-sm" type="button" data-ai-action="use-category" data-ai-value="{{ ai.suggested_category.name }}">Use suggestion</button></p>{% endif %}
+    </div>
+    {% if record.content_type == 'text' %}<div class="panel mb-4">{{ field(form.body_text) }}</div>
+    {% else %}<div class="panel mb-4">
+      <p class="small text-muted-2">The original machine transcript is always preserved. Your corrections are saved separately.</p>
+      {{ field(form.transcript_text) }}{{ field(form.translation_hi, "Leave blank if you have no Hindi translation.") }}{{ field(form.translation_en, "Leave blank if you have no English translation.") }}
+      <div class="d-none">{{ form.body_text() }}</div></div>{% endif %}
+    <div class="panel mb-4"><fieldset><legend class="form-label fs-6">Publication preference</legend>
+      {% for o in form.is_public %}<div class="form-check mb-1">{{ o(class_="form-check-input") }} {{ o.label(class_="form-check-label") }}</div>{% endfor %}</fieldset>
+      {{ field(form.attribution) }}</div>
+    <button class="btn btn-primary" type="submit">Save changes</button>
+  </form>
+</div>
+{% endblock %}

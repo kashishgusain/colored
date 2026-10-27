@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "_macros.html" import record_card %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-copy">
+    <p class="hero-tagline">{{ TAGLINE }}</p>
+    <h1>The stories of Uttarakhand, kept in the voices that tell them.</h1>
+    <p class="lead mb-4">LOKVAANI AI helps families and communities record Garhwali and Kumaoni folk stories, songs, recipes and customs. AI transcribes and organises. Community Stewards verify. Only approved knowledge is shared.</p>
+    <div class="hero-actions d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="{{ url_for('search.explore') }}">Explore heritage</a>
+      <a class="btn btn-gold" href="{{ url_for('contributions.new') if current_user.is_authenticated and current_user.can_contribute else url_for('auth.register') }}">Contribute knowledge</a>
+      <a class="btn btn-outline-primary" href="{{ url_for('chatbot.page') }}">Ask AI</a>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="false"><img src="{{ url_for('static', filename='images/hero-ridges.svg') }}" alt="Layered Himalayan ridgelines. The farthest ridge is drawn as a voice waveform."></div>
+</section>
+
+<section class="stat-band" aria-label="Archive statistics">
+  <div class="container">
+    {% if stats.records %}
+    <div class="row g-3 text-center text-md-start">
+      <div class="col-6 col-md-3"><div class="num">{{ stats.records }}</div><div class="lbl">approved public records</div></div>
+      <div class="col-6 col-md-3"><div class="num">{{ stats.recordings }}</div><div class="lbl">audio and video recordings</div></div>
+      <div class="col-6 col-md-3"><div class="num">{{ stats.contributors }}</div><div class="lbl">contributors</div></div>
+      <div class="col-6 col-md-3"><div class="num">{{ stats.districts }}</div><div class="lbl">districts represented</div></div>
+    </div>
+    {% else %}
+    <p class="stat-empty mb-0">The archive is just opening. Be among the first to add a story, song or recipe from your village. Every record is reviewed by a Community Steward before it appears here.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="block">
+  <div class="container">
+    <div class="section-head"><h2>Recently verified</h2><p>Records approved by Community Stewards and marked public by the people who shared them.</p></div>
+    {% if featured %}
+    <div class="row g-4">{% for r in featured %}<div class="col-md-6 col-lg-4">{{ record_card(r) }}</div>{% endfor %}</div>
+    <p class="mt-4"><a href="{{ url_for('search.explore') }}">Browse the whole archive</a></p>
+    {% else %}
+    <div class="empty"><h3>No public records yet</h3><p class="mb-3">When a Contributor shares a record and a Steward approves it, it appears here. You can start by recording a grandparent telling a story, or by writing down a family recipe.</p>
+      <a class="btn btn-primary" href="{{ url_for('auth.register') }}">Create a free account</a></div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="block band-ivory">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4"><h2>What we preserve</h2><p class="lead">Six kinds of living knowledge, each reviewed by people who know it.</p></div>
+      <div class="col-lg-8">
+        {% for c in categories %}
+        <a class="cat-row" href="{{ url_for('search.explore', category=c.id) }}">
+          <div><h3>{{ c.name }}</h3><p>{{ c.description }}</p></div>
+          <span class="count">{{ counts.get(c.id, 0) }} public {{ 'record' if counts.get(c.id, 0) == 1 else 'records' }}</span>
+        </a>
+        {% else %}<p class="text-muted-2">Categories have not been created yet. An administrator can run <code>flask seed-categories</code>.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="container">
+    <div class="section-head"><h2>How it works</h2><p>From a recording on a phone to a verified record anyone can search.</p></div>
+    <ol class="steps">
+      <li><h3>Share</h3><p>Upload an audio or video recording, or write your story. Choose whether it may be public.</p></li>
+      <li><h3>AI assists</h3><p>Speech is transcribed and translated where a provider is configured. Nothing is made up.</p></li>
+      <li><h3>You check</h3><p>You correct the transcript and tags, then submit the record for verification.</p></li>
+      <li><h3>Stewards verify</h3><p>A Community Steward listens, edits, and approves, rejects or asks for corrections.</p></li>
+      <li><h3>Everyone learns</h3><p>Approved public records become searchable and are cited when you ask LOKVAANI AI.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="block band-green">
+  <div class="container d-md-flex align-items-center justify-content-between gap-4">
+    <div><h2>Ask the archive a question</h2><p class="mb-0" style="color:#d3e0d8">Answers come only from approved records, with the source shown. If the archive does not know, it says so.</p></div>
+    <a class="btn btn-gold mt-3 mt-md-0" href="{{ url_for('chatbot.page') }}">Ask LOKVAANI AI</a>
+  </div>
+</section>
+{% endblock %}

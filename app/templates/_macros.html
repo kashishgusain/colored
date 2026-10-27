@@ -1,0 +1,38 @@
+{% macro status_badge(record) %}<span class="badge-status st-{{ record.status }}">{{ record.status_label }}</span>{% endmacro %}
+
+{% macro field(f, hint=None) %}
+<div class="mb-3">
+  {{ f.label(class_="form-label") }}
+  {% if f.type in ('SelectField',) %}{{ f(class_="form-select" + (" is-invalid" if f.errors else "")) }}
+  {% elif f.type == 'BooleanField' %}{{ f(class_="form-check-input") }}
+  {% else %}{{ f(class_="form-control" + (" is-invalid" if f.errors else "")) }}{% endif %}
+  {% for e in f.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+  {% if hint %}<div class="form-text">{{ hint }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro record_card(r) %}
+<article class="record-card cat-{{ r.category.slug }}">
+  <div class="small text-muted-2">{{ r.category.name }}{% if r.content_type != 'text' %} &middot; {{ 'Video' if r.content_type == 'video' else 'Audio' }} recording{% endif %}</div>
+  <h3><a href="{{ url_for('search.record_detail', record_id=r.id) }}">{{ r.title }}</a></h3>
+  <p>{{ (r.summary or r.description)|truncate(160) }}</p>
+  <div class="meta">{{ r.language_label }}{% if r.district %}, {{ r.district }}{% endif %}<br>Shared by {{ r.attribution_label }}</div>
+</article>
+{% endmacro %}
+
+{% macro pager(p, endpoint) %}
+{% if p.pages > 1 %}
+<nav aria-label="Pages"><ul class="pagination justify-content-center mt-4">
+  <li class="page-item {{ 'disabled' if not p.has_prev }}"><a class="page-link" href="{{ url_for(endpoint, page=p.prev_num, **kwargs) if p.has_prev else '#' }}">Previous</a></li>
+  <li class="page-item disabled"><span class="page-link">Page {{ p.page }} of {{ p.pages }}</span></li>
+  <li class="page-item {{ 'disabled' if not p.has_next }}"><a class="page-link" href="{{ url_for(endpoint, page=p.next_num, **kwargs) if p.has_next else '#' }}">Next</a></li>
+</ul></nav>
+{% endif %}
+{% endmacro %}
+
+{% macro csrf_post(action, label, cls="btn btn-outline-primary btn-sm", confirm=None) %}
+<form method="post" action="{{ action }}" {% if confirm %}data-confirm="{{ confirm }}"{% endif %} class="d-inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="{{ cls }}">{{ label }}</button>
+</form>
+{% endmacro %}

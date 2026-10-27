@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% from "_macros.html" import field %}
+{% block title %}Create account · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container"><div class="auth-wrap panel">
+  <h1 class="h2 mb-3">Create your account</h1>
+  <form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    {{ field(form.display_name) }}{{ field(form.username) }}{{ field(form.email) }}
+    {{ field(form.password, "At least 10 characters, mixing letters with numbers or symbols.") }}{{ field(form.confirm) }}
+    <div class="form-check mb-3">{{ form.want_to_contribute(class_="form-check-input") }} {{ form.want_to_contribute.label(class_="form-check-label") }}
+      <div class="form-text">Contributors can upload recordings and stories. Their submissions are reviewed before anything is public. Stewards and admins are appointed by the team.</div></div>
+    <button class="btn btn-primary w-100" type="submit">Create account</button>
+  </form>
+  <p class="mt-3 mb-0 small">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+</div></div>
+{% endblock %}

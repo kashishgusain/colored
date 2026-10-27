@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% from "_macros.html" import record_card, pager %}
+{% block title %}Explore heritage · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-2">Explore heritage</h1>
+  <p class="lead">Every record here was verified by a Community Steward and shared publicly by its contributor.</p>
+  <form class="panel mb-4" method="get" action="{{ url_for('search.explore') }}">
+    <div class="row g-3 align-items-end">
+      <div class="col-lg-12"><label class="form-label" for="q">Search by word, place, tradition or story</label>
+        <input class="form-control" id="q" name="q" type="search" value="{{ q }}" maxlength="200" placeholder="for example: harela, kafuli, Nanda Devi"></div>
+      <div class="col-sm-6 col-lg-3"><label class="form-label" for="category">Category</label><select class="form-select" id="category" name="category"><option value="">All</option>
+        {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if filters.category_id == c.id }}>{{ c.name }}</option>{% endfor %}</select></div>
+      <div class="col-sm-6 col-lg-3"><label class="form-label" for="language">Language</label><select class="form-select" id="language" name="language"><option value="">All</option>
+        {% for v, l in LANGUAGES %}<option value="{{ v }}" {{ 'selected' if filters.language == v }}>{{ l }}</option>{% endfor %}</select></div>
+      <div class="col-sm-6 col-lg-3"><label class="form-label" for="district">District</label><select class="form-select" id="district" name="district"><option value="">All</option>
+        {% for d in districts %}<option {{ 'selected' if filters.district == d }}>{{ d }}</option>{% endfor %}</select></div>
+      <div class="col-sm-6 col-lg-3"><label class="form-label" for="type">Format</label><select class="form-select" id="type" name="type"><option value="">All</option>
+        <option value="media" {{ 'selected' if filters.content_type == 'media' }}>Audio or video</option><option value="audio" {{ 'selected' if filters.content_type == 'audio' }}>Audio only</option>
+        <option value="video" {{ 'selected' if filters.content_type == 'video' }}>Video only</option><option value="text" {{ 'selected' if filters.content_type == 'text' }}>Written</option></select></div>
+      <div class="col-12 d-flex gap-2"><button class="btn btn-primary" type="submit">Search</button><a class="btn btn-outline-primary" href="{{ url_for('search.explore') }}">Clear filters</a></div>
+    </div>
+  </form>
+  {% set p = result.pagination %}
+  <p class="text-muted-2" aria-live="polite">{{ p.total }} {{ 'record' if p.total == 1 else 'records' }}{% if q %} for "{{ q }}"{% endif %}
+    {% if result.mode == 'semantic+keyword' %}&middot; meaning-based and keyword matches{% elif result.mode == 'keyword' and q %}&middot; keyword matches{% endif %}</p>
+  {% if result.note %}<div class="notice mb-3">{{ result.note }}</div>{% endif %}
+  {% if result.records %}
+  <div class="row g-4">{% for r in result.records %}<div class="col-md-6 col-lg-4">{{ record_card(r) }}</div>{% endfor %}</div>
+  {{ pager(p, 'search.explore', q=q, category=filters.category_id, language=filters.language, district=filters.district, type=filters.content_type) }}
+  {% else %}
+  <div class="empty"><h2 class="h4">No matching records</h2><p class="mb-3">{% if q or filters.category_id or filters.language or filters.district or filters.content_type %}Try fewer filters or different words. Garhwali and Kumaoni words can be spelled in several ways.{% else %}The public archive is empty so far. Approved records will appear here.{% endif %}</p>
+    <a class="btn btn-primary" href="{{ url_for('auth.register') }}">Contribute knowledge</a></div>
+  {% endif %}
+</div>
+{% endblock %}

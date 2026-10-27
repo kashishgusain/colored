@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% from "_macros.html" import csrf_post %}
+{% block title %}Messages · Admin{% endblock %}
+{% block content %}
+<div class="container py-5"><p><a href="{{ url_for('admin.dashboard') }}">&larr; Admin</a></p><h1 class="mb-3">Contact messages</h1>
+  {% for m in rows %}<div class="panel mb-3"><div class="d-flex justify-content-between"><strong>{{ m.subject }}</strong><span class="small text-muted-2">{{ m.created_at|dt }}</span></div>
+    <div class="small text-muted-2 mb-2">{{ m.name }} &lt;{{ m.email }}&gt;</div><p>{{ m.message }}</p>{% if m.is_resolved %}<span class="pill">Resolved</span>{% else %}{{ csrf_post(url_for('admin.resolve_message', msg_id=m.id), 'Mark resolved') }}{% endif %}</div>
+  {% else %}<div class="empty">No messages yet.</div>{% endfor %}</div>
+{% endblock %}

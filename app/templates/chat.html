@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Ask LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-2">Ask LOKVAANI AI</h1>
+  <p class="lead">Answers come only from records that Community Stewards approved and contributors made public. Every answer shows its sources.</p>
+  {% if not ai_ready %}<div class="notice mb-4"><strong>Retrieval-only mode.</strong> No language model is configured on this server, so you will see matching records and excerpts instead of a written answer. An administrator can enable AI answers with <code>LLM_PROVIDER=openai</code> and an API key.</div>{% endif %}
+  <div class="chat-shell">
+    <aside>
+      <form method="post" action="{{ url_for('chatbot.new') }}" class="mb-3"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-outline-primary w-100" type="submit">New conversation</button></form>
+      {% if history %}<h2 class="h6">Your conversations</h2><div class="d-grid gap-1">
+        {% for s in history %}<form method="post" action="{{ url_for('chatbot.open_session', session_id=s.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm text-start w-100 {{ 'btn-light fw-bold' if chat and chat.id == s.id else 'btn-link text-decoration-none' }}" type="submit">{{ s.title|truncate(34) }}</button></form>{% endfor %}</div>
+      {% elif not current_user.is_authenticated %}<p class="small text-muted-2">Sign in to keep your conversations.</p>{% endif %}
+    </aside>
+    <section aria-label="Conversation">
+      <div class="panel">
+        <div class="chat-log" id="chat-log" aria-live="polite">
+          {% if chat and chat.messages %}
+            {% for m in chat.messages %}
+              {% if m.role == 'user' %}<div class="msg user"><div class="who">You</div><div class="bubble">{{ m.content }}</div></div>
+              {% else %}<div class="msg bot"><div class="who">LOKVAANI AI</div><div class="bubble">{% if m.mode %}<span class="mode-tag mode-{{ m.mode }}">{{ {'ai_answer':'AI answer from approved records','retrieval_only':'Retrieval only (no AI summary)','llm_error':'AI unavailable: showing records','no_evidence':'Not found in the archive'}.get(m.mode, m.mode) }}</span><br>{% endif %}{{ m.content }}</div>
+                {% for s in m.sources %}<div class="source"><a href="{{ url_for('search.record_detail', record_id=s.record_id) }}">[{{ s.n }}] {{ s.title }}</a> <span class="text-muted-2">— {{ s.category }}, {{ s.language }}</span><q>{{ s.excerpt }}</q></div>{% endfor %}</div>{% endif %}
+            {% endfor %}
+          {% else %}<div class="msg bot"><div class="bubble">Ask about a folk story, a festival, a recipe or a custom. For example:</div>
+            <div class="d-flex flex-wrap gap-2 mt-2"><button type="button" class="suggest" data-q="Tell me about a folk story from Garhwal">A folk story from Garhwal</button><button type="button" class="suggest" data-q="What traditions are mentioned about a local festival?">Traditions of a local festival</button><button type="button" class="suggest" data-q="What ingredients are described in the traditional recipes?">Ingredients in traditional recipes</button></div></div>{% endif %}
+        </div>
+        <form id="chat-form" class="d-flex gap-2 mt-3" data-url="{{ url_for('chatbot.ask') }}">
+          <label class="visually-hidden" for="chat-input">Your question</label>
+          <input class="form-control" id="chat-input" maxlength="800" autocomplete="off" placeholder="Ask about the archive…" required minlength="3">
+          <button class="btn btn-primary" type="submit">Ask</button>
+        </form>
+        <p class="small text-muted-2 mt-2 mb-0">LOKVAANI AI can be wrong, especially with Garhwali and Kumaoni. Check the cited records before relying on an answer.</p>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/chat.js') }}"></script>{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% from "_macros.html" import field %}
+{% block title %}Your profile · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5"><div class="row g-4">
+  <div class="col-lg-6"><div class="panel">
+    <h1 class="h3">Your profile</h1>
+    <p class="text-muted-2">Signed in as <strong>{{ current_user.username }}</strong> ({{ current_user.email }}). Role: <strong>{{ current_user.role_label }}</strong></p>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}<input type="hidden" name="action" value="profile">
+      {{ field(form.display_name) }}{{ field(form.bio) }}
+      <button class="btn btn-primary" type="submit">Save profile</button>
+    </form>
+    {% if current_user.role == Role.PUBLIC %}
+    <hr><h2 class="h5">Share your knowledge</h2>
+    <form method="post" action="{{ url_for('auth.become_contributor') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="agree" id="agree"><label class="form-check-label" for="agree">I will only share material I have the right to share, and I will respect the wishes of the people I record.</label></div>
+      <button class="btn btn-gold" type="submit">Become a contributor</button>
+    </form>{% endif %}
+  </div></div>
+  <div class="col-lg-6"><div class="panel">
+    <h2 class="h3">Change password</h2>
+    <form method="post" novalidate>
+      {{ pw_form.hidden_tag() }}<input type="hidden" name="action" value="password">
+      {{ field(pw_form.current) }}{{ field(pw_form.new) }}{{ field(pw_form.confirm) }}
+      <button class="btn btn-primary" type="submit">Change password</button>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

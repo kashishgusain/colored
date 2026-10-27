@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% from "_macros.html" import pager %}
+{% block title %}Audit log · Admin{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <p><a href="{{ url_for('admin.dashboard') }}">&larr; Admin</a></p><h1 class="mb-3">Audit and review logs</h1>
+  <form class="row g-2 mb-3" method="get"><div class="col-md-4"><label class="visually-hidden" for="action">Action prefix</label><input class="form-control" id="action" name="action" value="{{ action }}" placeholder="Action starts with, e.g. review."></div><div class="col-auto"><button class="btn btn-primary" type="submit">Filter</button></div></form>
+  <div class="table-responsive"><table class="table table-lok"><thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Target</th><th>Detail</th><th>IP</th></tr></thead><tbody>
+    {% for a in pag.items %}<tr><td>{{ a.created_at|dt }}</td><td>{{ a.actor.username if a.actor else 'system' }}</td><td>{{ a.action }}</td><td>{{ a.target_type or '' }} {{ a.target_id or '' }}</td><td>{{ a.detail or '' }}</td><td>{{ a.ip_address or '' }}</td></tr>
+    {% else %}<tr><td colspan="6" class="text-muted-2">Nothing logged.</td></tr>{% endfor %}</tbody></table></div>
+  {{ pager(pag, 'admin.audit_log', action=action) }}
+  <h2 class="h4 mt-4">Latest moderation decisions</h2>
+  <div class="table-responsive"><table class="table table-lok"><thead><tr><th>When</th><th>Record</th><th>From</th><th>To</th><th>Reviewer</th><th>Note</th></tr></thead><tbody>
+    {% for r in reviews %}<tr><td>{{ r.created_at|dt }}</td><td>{{ r.record.title }}</td><td>{{ r.from_status }}</td><td>{{ r.to_status }}</td><td>{{ r.reviewer.username }}</td><td>{{ r.comment or '' }}</td></tr>
+    {% else %}<tr><td colspan="6" class="text-muted-2">No decisions yet.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endblock %}

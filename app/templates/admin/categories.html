@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% from "_macros.html" import field, csrf_post %}
+{% block title %}Categories · Admin{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <p><a href="{{ url_for('admin.dashboard') }}">&larr; Admin</a></p><h1 class="mb-3">Categories</h1>
+  <form method="post" class="panel mb-4 row g-3 align-items-end" novalidate>{{ form.hidden_tag() }}
+    <div class="col-md-4">{{ field(form.name) }}</div><div class="col-md-6">{{ field(form.description) }}</div><div class="col-md-2 mb-3"><button class="btn btn-primary w-100" type="submit">Add category</button></div></form>
+  <div class="table-responsive"><table class="table table-lok align-middle"><thead><tr><th>Name</th><th>Description</th><th>Records</th><th>Active</th><th></th></tr></thead><tbody>
+    {% for c, n in rows %}<tr><td>{{ c.name }}</td><td>{{ c.description or '' }}</td><td>{{ n }}</td><td>{{ 'Yes' if c.is_active else 'No' }}</td>
+      <td class="text-end">{{ csrf_post(url_for('admin.toggle_category', cat_id=c.id), 'Deactivate' if c.is_active else 'Activate') }} {% if n == 0 %}{{ csrf_post(url_for('admin.delete_category', cat_id=c.id), 'Delete', 'btn btn-brick btn-sm', 'Delete this category?') }}{% endif %}</td></tr>
+    {% else %}<tr><td colspan="5" class="text-muted-2">No categories. Run <code>flask seed-categories</code> or add one above.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endblock %}

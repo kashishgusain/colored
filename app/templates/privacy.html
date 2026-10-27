@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Privacy and consent · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:820px">
+  <h1>Privacy and consent</h1>
+  <h2>What we store</h2><p>Your account details, the recordings and text you submit, the transcripts and translations made from them, review decisions, and your conversations with the assistant if you are signed in.</p>
+  <h2>Who can see what</h2>
+  <ul><li><strong>Private archive:</strong> visible only to you and to Community Stewards and administrators who review it. Never in public search or the assistant.</li>
+  <li><strong>Public archive:</strong> visible to everyone only after a steward approves it and only if you chose public.</li>
+  <li>Supporting documents are never shown publicly.</li></ul>
+  <h2>Your control</h2><p>You choose how you are credited. You can withdraw a record at any time, which removes it from public pages, search and the assistant, and you can delete it permanently, which also removes its files and index entries. Assistant answers that cited a withdrawn record are removed from conversation history.</p>
+  <h2>AI providers</h2><p>If an external provider such as OpenAI is configured, the text or audio of a record may be sent to it for transcription, translation or summaries. The administrator should tell contributors which providers are active.</p>
+  <h2>Security</h2><p>Passwords are hashed, forms are protected against forgery, uploads are validated and stored outside the web root, and every protected page checks your role on the server.</p>
+</div>
+{% endblock %}

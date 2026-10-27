@@ -1,0 +1,76 @@
+{% extends "base.html" %}{% from "_macros.html" import status_badge, csrf_post %}
+{% block title %}{{ record.title }} · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <p class="mb-2"><a href="{{ url_for('main.dashboard') }}">&larr; Your dashboard</a></p>
+  <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start mb-3">
+    <div><h1 class="h2 mb-1">{{ record.title }}</h1>
+      <div>{{ status_badge(record) }} <span class="text-muted-2 ms-2">{{ record.category.name }} &middot; {{ record.language_label }}{% if record.district %} &middot; {{ record.district }}{% endif %} &middot; {{ 'Public' if record.is_public else 'Private' }} archive</span></div></div>
+    <div class="d-flex flex-wrap gap-2">
+      {% if record.status not in (Status.PROCESSING, Status.REJECTED, Status.WITHDRAWN) %}<a class="btn btn-outline-primary" href="{{ url_for('contributions.edit', record_id=record.id) }}">Review and correct</a>{% endif %}
+      {% if record.status in (Status.DRAFT, Status.NEEDS_REVISION) %}{{ csrf_post(url_for('contributions.submit', record_id=record.id), 'Submit for verification', 'btn btn-primary') }}{% endif %}
+    </div>
+  </div>
+
+  {% if record.steward_note and record.status in (Status.NEEDS_REVISION, Status.REJECTED, Status.APPROVED) %}
+  <div class="notice {{ 'notice-danger' if record.status != Status.APPROVED }} mb-4"><strong>Steward note:</strong> {{ record.steward_note }}</div>{% endif %}
+
+  {% if record.status == Status.PROCESSING %}
+  <div class="panel mb-4" id="job-poll" data-url="{{ url_for('contributions.status_json', record_id=record.id) }}">
+    <h2 class="h5">{{ 'Preparing AI suggestions' if record.content_type == 'text' else 'Processing your recording' }}</h2>
+    <div class="progress mb-2" role="progressbar" aria-label="Processing progress"><div class="progress-bar" id="job-bar" style="width: {{ job.progress if job else 0 }}%"></div></div>
+    <p class="mb-0 small text-muted-2">Current step: <span id="job-stage">{{ (job.stage if job else 'queued')|replace('_',' ') }}</span>. This page updates automatically.</p>
+  </div>
+  {% elif job %}
+  <div class="panel mb-4">
+    <h2 class="h5">Processing result</h2>
+    {% if job.status == 'succeeded' %}<p class="mb-2">The recording was processed. Please listen and correct the transcript before you submit.</p>
+    {% elif job.status == 'failed' %}
+      <div class="notice notice-danger mb-3"><strong>Processing did not finish</strong> ({{ job.error_code }}).<br>{{ job.error_message }}</div>
+      {% if record.status in (Status.DRAFT, Status.NEEDS_REVISION) %}{{ csrf_post(url_for('contributions.retry', record_id=record.id), 'Retry processing', 'btn btn-gold') }}
+      <span class="small text-muted-2 ms-2">or open "Review and correct" and type the transcript yourself.</span>{% endif %}
+    {% endif %}
+    {% if job.warnings %}<ul class="small mt-3 mb-0">{% for w in job.warnings.split('\n') %}<li>{{ w }}</li>{% endfor %}</ul>
+      {% if record.content_type == 'text' and ('Summary and metadata skipped:' in job.warnings or 'Summary and metadata failed (' in job.warnings) and record.status in (Status.DRAFT, Status.NEEDS_REVISION) %}
+        {{ csrf_post(url_for('contributions.retry', record_id=record.id), 'Retry AI suggestions', 'btn btn-outline-primary btn-sm mt-3') }}
+      {% endif %}
+    {% endif %}
+  </div>{% endif %}
+  {% if dialect_warning %}<div class="notice mb-4">{{ dialect_warning }}</div>{% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      {% if record.primary_media %}<div class="panel mb-4"><h2 class="h5">Your recording</h2>
+        {% set m = record.primary_media %}{% if m.kind == 'video' %}<video controls preload="metadata" src="{{ url_for('search.serve_media', asset_id=m.id) }}"></video>
+        {% else %}<audio controls preload="metadata" src="{{ url_for('search.serve_media', asset_id=m.id) }}"></audio>{% endif %}
+        <p class="small text-muted-2 mt-2 mb-0">{{ m.original_filename }} &middot; {{ (m.size_bytes / 1048576)|round(1) }} MB</p></div>{% endif %}
+      {% if record.body_text %}<div class="panel mb-4"><h2 class="h5">Text</h2><div class="transcript">{{ record.body_text }}</div></div>{% endif %}
+      {% if record.primary_media %}<div class="panel mb-4"><h2 class="h5">Transcript</h2>
+        {% if record.transcript_text %}<div class="transcript">{{ record.transcript_text }}</div>
+        <p class="small text-muted-2 mt-2 mb-0">Source: {{ record.transcript.source|replace('_',' ') }}{% if record.transcript.edited_text is not none %} (corrected by a person){% endif %}. The original is preserved.</p>
+        {% else %}<p class="mb-0 text-muted-2">No transcript yet.</p>{% endif %}</div>
+      {% for lang, label in (('hi','Hindi'),('en','English')) %}{% set t = record.translation_for(lang) %}{% if t %}<div class="panel mb-4"><h2 class="h5">{{ label }} translation</h2><div class="transcript">{{ t.text }}</div><p class="small text-muted-2 mt-2 mb-0">{{ 'Edited by a person' if t.is_human_edited else 'Machine translation, not yet checked' }}</p></div>{% endif %}{% endfor %}
+      {% endif %}
+    </div>
+    <div class="col-lg-5">
+      <div class="panel mb-4"><h2 class="h5">Details</h2>
+        <p class="mb-2">{{ record.description }}</p>
+        {% if record.summary %}<p class="mb-2"><strong>Summary:</strong> {{ record.summary }}</p>{% endif %}
+        <div class="mb-2">{% for t in record.tag_list %}<span class="pill">{{ t }}</span>{% endfor %}</div>
+        {% if record.ai_suggested_tags %}<p class="small text-muted-2 mb-2">AI-suggested tags (not applied): {{ record.ai_suggested_tags }}</p>{% endif %}
+        {% set ai = record.ai_metadata %}
+        {% if ai.suggested_summary %}<p class="small text-muted-2 mb-2"><strong>AI summary suggestion (not applied):</strong> {{ ai.suggested_summary }}</p>{% endif %}
+        {% if ai.suggested_category %}<p class="small text-muted-2 mb-2"><strong>AI category suggestion (not applied):</strong> {{ ai.suggested_category.name }}</p>{% endif %}
+        <p class="small text-muted-2 mb-0">Credit: {{ record.attribution_label }}. Consent recorded {{ record.consent_at|dt('%d %b %Y') }}.</p></div>
+      {% if record.reviews %}<div class="panel mb-4"><h2 class="h5">Review history</h2><ul class="list-unstyled mb-0">
+        {% for rv in record.reviews %}<li class="mb-2"><strong>{{ Status.LABELS.get(rv.to_status, rv.to_status) if rv.decision != 'comment' else 'Note' }}</strong> <span class="small text-muted-2">by {{ rv.reviewer.display_name }}, {{ rv.created_at|dt }}</span>{% if rv.comment %}<br>{{ rv.comment }}{% endif %}</li>{% endfor %}</ul></div>{% endif %}
+      {% if record.status == Status.APPROVED and record.is_public %}<p><a class="btn btn-outline-primary" href="{{ url_for('search.record_detail', record_id=record.id) }}">View public page</a></p>{% endif %}
+      <div class="panel"><h2 class="h5">Withdraw or delete</h2>
+        <p class="small text-muted-2">Withdrawing removes the record from public search and the AI assistant. Deleting permanently removes the record, files and index entries.</p>
+        {% if record.status in (Status.APPROVED, Status.PENDING) %}{{ csrf_post(url_for('contributions.withdraw', record_id=record.id), 'Withdraw from public', 'btn btn-outline-primary btn-sm', 'Withdraw this record from the public archive?') }}{% endif %}
+        {% if record.status != Status.PROCESSING %}{{ csrf_post(url_for('contributions.delete', record_id=record.id), 'Delete permanently', 'btn btn-brick btn-sm', 'Permanently delete this record and its files? This cannot be undone.') }}{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

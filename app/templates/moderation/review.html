@@ -1,0 +1,43 @@
+{% extends "base.html" %}{% from "_macros.html" import status_badge, field %}
+{% block title %}Review: {{ record.title }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <p class="mb-2"><a href="{{ url_for('moderation.dashboard') }}">&larr; Review queue</a></p>
+  <h1 class="h2">{{ record.title }}</h1>
+  <p>{{ status_badge(record) }} <span class="text-muted-2 ms-2">by {{ record.owner.display_name }} &middot; {{ record.category.name }} &middot; {{ record.language_label }} &middot; {{ 'Public' if record.is_public else 'Private' }} &middot; consent {{ 'recorded ' ~ record.consent_at|dt('%d %b %Y') if record.consent_given else 'MISSING' }}</span></p>
+  {% if dialect_warning %}<div class="notice mb-3">{{ dialect_warning }}</div>{% endif %}
+  {% if not record.is_public %}<div class="notice mb-3">Private record: even if approved it never appears in public search or the chatbot.</div>{% endif %}
+  <div class="row g-4">
+    <div class="col-lg-7">
+      {% if record.primary_media %}{% set m = record.primary_media %}<div class="panel mb-4"><h2 class="h5">Recording</h2>
+        {% if m.kind == 'video' %}<video controls preload="metadata" src="{{ url_for('search.serve_media', asset_id=m.id) }}"></video>{% else %}<audio controls preload="metadata" src="{{ url_for('search.serve_media', asset_id=m.id) }}"></audio>{% endif %}
+        {% for d in record.media if d.kind == 'document' %}<p class="small mt-2 mb-0"><a href="{{ url_for('search.serve_media', asset_id=d.id) }}">Supporting document: {{ d.original_filename }}</a></p>{% endfor %}</div>{% endif %}
+      <form method="post" action="{{ url_for('moderation.edit', record_id=record.id) }}" class="panel">
+        {{ form.hidden_tag() }}<h2 class="h5">Edit content</h2>
+        {{ field(form.title) }}{{ field(form.description) }}<div class="row"><div class="col-md-6">{{ field(form.category_id) }}</div><div class="col-md-6">{{ field(form.tags) }}</div></div>{{ field(form.summary) }}
+        {% if record.content_type == 'text' %}{{ field(form.body_text) }}
+        {% else %}<p class="small text-muted-2">Original machine transcript preserved: {{ 'yes' if record.transcript else 'no transcript' }}{% if record.transcript %} (source: {{ record.transcript.source }}){% endif %}.</p>
+        {{ field(form.transcript_text) }}{{ field(form.translation_hi) }}{{ field(form.translation_en) }}{% endif %}
+        <button class="btn btn-primary" type="submit">Save edits</button>
+      </form>
+    </div>
+    <div class="col-lg-5">
+      <div class="panel mb-4"><h2 class="h5">Decision</h2>
+        {% if own and current_user.role != Role.ADMIN %}<div class="notice notice-danger">This is your own submission. Another steward must review it.</div>
+        {% elif record.status in (Status.PENDING, Status.APPROVED) %}
+        <form method="post" action="{{ url_for('moderation.decide', record_id=record.id) }}">
+          {{ decision_form.hidden_tag() }}
+          <div class="mb-3"><label class="form-label" for="decision">Decision</label><select class="form-select" id="decision" name="decision">
+            {% if record.status == Status.PENDING %}<option value="approve">Approve</option><option value="revise">Request corrections</option><option value="reject">Reject</option>
+            {% else %}<option value="revise">Request corrections (removes from public)</option>{% endif %}<option value="comment">Add a note only</option></select></div>
+          <div class="mb-3"><label class="form-label" for="comment">Note (required to reject or request corrections)</label><textarea class="form-control" id="comment" name="comment" rows="4" maxlength="2000"></textarea></div>
+          <button class="btn btn-primary" type="submit">Save decision</button></form>
+        {% else %}<p class="mb-0 text-muted-2">No decision is possible while the record is {{ record.status_label.lower() }}.</p>{% endif %}
+      </div>
+      <div class="panel"><h2 class="h5">Review history</h2>
+        {% if record.reviews %}<ul class="list-unstyled mb-0">{% for rv in record.reviews %}<li class="mb-2"><strong>{{ 'Note' if rv.decision == 'comment' else Status.LABELS.get(rv.to_status, rv.to_status) }}</strong> <span class="small text-muted-2">{{ rv.reviewer.display_name }}, {{ rv.created_at|dt }}</span>{% if rv.comment %}<br>{{ rv.comment }}{% endif %}</li>{% endfor %}</ul>
+        {% else %}<p class="mb-0 text-muted-2">No previous actions.</p>{% endif %}</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

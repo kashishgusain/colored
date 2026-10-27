@@ -1,3 +1,8 @@
+# summarizer
+Provide the summarry of entire youtube video 
+
+
+
 # LOKVAANI AI
 
 Preserve the past. Understand it. Build the future.
@@ -23,7 +28,7 @@ python app.py
 
 Open http://127.0.0.1:5000
 
-Demo accounts (created by `seed_data.py`):
+Demo accounts (created by `seed_data.py`)....
 
 | Username | Password    | Role    | Community                    |
 |----------|-------------|---------|-------------------------------|
@@ -102,3 +107,4 @@ uploads/                   Uploaded media (gitignored; served only to authentica
   extraction LLM prompt.
 - Reporting/flagging workflow, product/marketplace layer, and researcher access-request flow
   are not built — see the original scope doc for what was deliberately cut.
+

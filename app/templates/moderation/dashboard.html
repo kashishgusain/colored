@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% from "_macros.html" import status_badge %}
+{% block title %}Review queue · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-2">Review queue</h1>
+  <p class="lead">Listen, read, correct and decide. Every decision is logged.</p>
+  <h2 class="h4">Waiting for review ({{ pending|length }})</h2>
+  {% if pending %}<div class="table-responsive"><table class="table table-lok align-middle">
+    <thead><tr><th>Title</th><th>Type</th><th>Language</th><th>Contributor</th><th>Visibility</th><th>Submitted</th><th></th></tr></thead>
+    <tbody>{% for r in pending %}<tr><td>{{ r.title }}</td><td>{{ r.content_type|capitalize }}</td><td>{{ r.language_label }}</td><td>{{ r.owner.display_name }}</td>
+      <td>{{ 'Public' if r.is_public else 'Private' }}</td><td>{{ r.submitted_at|dt('%d %b %Y') }}</td>
+      <td class="text-end"><a class="btn btn-sm btn-primary" href="{{ url_for('moderation.review', record_id=r.id) }}">Review</a></td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="empty mb-4"><h3>Queue is clear</h3><p class="mb-0">New submissions appear here as soon as contributors submit them.</p></div>{% endif %}
+  {% if revision %}<h2 class="h4 mt-4">Waiting for the contributor</h2><ul>{% for r in revision %}<li><a href="{{ url_for('moderation.review', record_id=r.id) }}">{{ r.title }}</a> <span class="text-muted-2">({{ r.owner.display_name }})</span></li>{% endfor %}</ul>{% endif %}
+  <h2 class="h4 mt-4">Recent decisions</h2>
+  {% if recent %}<div class="table-responsive"><table class="table table-lok"><thead><tr><th>When</th><th>Record</th><th>Decision</th><th>Reviewer</th><th>Note</th></tr></thead><tbody>
+    {% for rv in recent %}<tr><td>{{ rv.created_at|dt }}</td><td><a href="{{ url_for('moderation.review', record_id=rv.record_id) }}">{{ rv.record.title }}</a></td><td>{{ 'Note' if rv.decision == 'comment' else Status.LABELS.get(rv.decision, rv.decision) }}</td><td>{{ rv.reviewer.display_name }}</td><td>{{ (rv.comment or '')|truncate(80) }}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<p class="text-muted-2">No decisions yet.</p>{% endif %}
+</div>
+{% endblock %}

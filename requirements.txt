@@ -1,4 +1,20 @@
+# Verified together on Python 3.12 (tests executed with these exact versions)
 Flask==3.0.3
-groq==0.11.0
-numpy==1.26.4
+Werkzeug==3.0.6
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.36
+Flask-Migrate==4.0.7
+alembic==1.20.0
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+WTForms==3.2.2
+Flask-Limiter==3.8.0
+email_validator==2.2.0
 python-dotenv==1.0.1
+httpx==0.27.2
+openai==1.51.2
+chromadb==1.5.9
+faster-whisper==1.2.1
+# Not installed in the build sandbox (no access to huggingface.co / large torch wheels), so NOT verified here.
+# pip installs the CPU/GPU torch build it needs automatically on Windows.
+sentence-transformers>=3.0,<6

@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% from "_macros.html" import field %}
+{% block title %}Contact · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:700px"><h1>Contact the team</h1><p class="lead">Questions, corrections, or a request to remove something? Write to us.</p>
+  <form class="panel" method="post" novalidate>{{ form.hidden_tag() }}{{ field(form.name) }}{{ field(form.email) }}{{ field(form.subject) }}{{ field(form.message) }}<button class="btn btn-primary" type="submit">Send message</button></form></div>
+{% endblock %}

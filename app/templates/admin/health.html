@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% from "_macros.html" import csrf_post %}
+{% block title %}Health · Admin{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <p><a href="{{ url_for('admin.dashboard') }}">&larr; Admin</a></p><h1 class="mb-3">Search and processing health</h1>
+  <div class="row g-3 mb-4">
+    <div class="col-md-6"><div class="panel"><h2 class="h5">Integrations</h2><ul class="mb-0">
+      <li>FFmpeg: <strong>{{ 'found' if ffmpeg else 'missing' }}</strong></li>
+      <li>Transcription ({{ transcription.provider }}): <strong>{{ 'ready' if transcription.ready else 'not ready' }}</strong> <span class="small text-muted-2">{{ transcription.detail }}</span></li>
+      <li>Language model: <strong>{{ 'configured' if llm else 'not configured' }}</strong></li><li>Translation: <strong>{{ 'configured' if translation else 'not configured' }}</strong></li></ul></div></div>
+    <div class="col-md-6"><div class="panel"><h2 class="h5">Vector index</h2><ul class="mb-3">
+      <li>Available: <strong>{{ 'yes' if index.available else 'no' }}</strong> <span class="small text-muted-2">{{ index.detail }}</span></li>
+      <li>Public records: {{ index.public_records }}; indexed records: {{ index.indexed_records }}; vectors: {{ index.vectors if index.vectors is not none else 'n/a' }}</li>
+      <li>In sync: <strong>{{ 'yes' if index.in_sync else ('no' if index.in_sync is not none else 'unknown') }}</strong></li></ul>
+      {{ csrf_post(url_for('admin.reindex'), 'Rebuild index', 'btn btn-primary btn-sm', 'Rebuild the semantic index from public records?') }}</div></div>
+  </div>
+  <h2 class="h4">Processing jobs</h2>
+  <p class="text-muted-2">{% for k, v in job_counts.items() %}{{ k }}: {{ v }}{{ ' · ' if not loop.last }}{% else %}No jobs yet.{% endfor %}</p>
+  {% if failed %}<div class="table-responsive"><table class="table table-lok"><thead><tr><th>When</th><th>Record</th><th>Code</th><th>Message</th></tr></thead><tbody>
+    {% for j in failed %}<tr><td>{{ j.finished_at|dt }}</td><td>{{ j.record.title }}</td><td>{{ j.error_code }}</td><td>{{ j.error_message }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p>No failed jobs.</p>{% endif %}
+</div>
+{% endblock %}

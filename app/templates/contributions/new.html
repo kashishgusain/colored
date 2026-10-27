@@ -1,0 +1,51 @@
+{% extends "base.html" %}{% from "_macros.html" import field %}
+{% block title %}Contribute knowledge · LOKVAANI AI{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:860px">
+  <h1 class="mb-2">Contribute knowledge</h1>
+  <p class="lead">Nothing you submit is public until a Community Steward approves it and you have allowed publication.</p>
+  <form method="post" enctype="multipart/form-data" novalidate data-busy="Uploading…">
+    {{ form.hidden_tag() }}
+    <div class="panel mb-4">
+      <h2>What are you sharing?</h2>
+      {% for sub in form.submission_type %}<div class="form-check mb-1">{{ sub(class_="form-check-input") }} {{ sub.label(class_="form-check-label") }}</div>{% endfor %}
+      <div class="mt-3" data-show-for="text">{{ field(form.body_text, "Write the story, recipe or description in Garhwali, Kumaoni, Hindi or English (Devanagari or Latin script).") }}</div>
+      <div class="mt-3" data-show-for="media" hidden>
+        {{ field(form.media_file, "Audio: MP3, WAV, M4A, OGG, FLAC, AAC. Video: MP4, MOV, WEBM, MKV, AVI. Up to 100 MB audio or 200 MB video.") }}
+        <div class="mb-3">
+          <label class="form-label" for="youtube-url">Or preview knowledge from a YouTube video</label>
+          <div class="input-group">
+            <input class="form-control" id="youtube-url" type="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="url">
+            <button class="btn btn-outline-primary" id="youtube-extract" type="button">Extract steps</button>
+          </div>
+          <div class="form-text">This converts the complete video transcript into concise knowledge steps. Upload the recording above to save it as this contribution.</div>
+          <div class="notice notice-danger mt-2" id="youtube-error" hidden></div>
+          <div class="panel mt-3" id="youtube-result" hidden>
+            <h3 class="h6">Knowledge steps</h3>
+            <ol class="mb-0" id="youtube-steps"></ol>
+          </div>
+        </div>
+        <div class="notice notice-danger mb-3"><strong>About accuracy.</strong> Speech models do not officially support Garhwali or Kumaoni. Transcripts of these languages are rough drafts, produced with a Hindi hint, and must be corrected by a fluent speaker. If no speech provider is set up on this server, you will be told and can type the transcript yourself.</div>
+      </div>
+    </div>
+    <div class="panel mb-4">
+      <h2>About this record</h2>
+      {{ field(form.title) }}{{ field(form.description) }}
+      <div class="row"><div class="col-md-6">{{ field(form.category_id) }}</div><div class="col-md-6">{{ field(form.language) }}</div></div>
+      <div class="row"><div class="col-md-6">{{ field(form.district) }}</div><div class="col-md-6">{{ field(form.village) }}</div></div>
+      {{ field(form.tags, "For example: jagar, harela, kafuli") }}
+      <div data-show-for="media" hidden>{{ field(form.photos, "Up to 6 photographs (JPG, PNG, WEBP).") }}{{ field(form.document, "PDF or TXT.") }}</div>
+    </div>
+    <div class="panel mb-4">
+      <h2>Credit and consent</h2>
+      {{ field(form.attribution) }}
+      <fieldset class="mb-3"><legend class="form-label fs-6">{{ form.is_public.label.text }}</legend>
+        {% for o in form.is_public %}<div class="form-check mb-1">{{ o(class_="form-check-input") }} {{ o.label(class_="form-check-label") }}</div>{% endfor %}</fieldset>
+      <div class="consent-box"><div class="form-check">{{ form.consent_given(class_="form-check-input") }} {{ form.consent_given.label(class_="form-check-label") }}</div>
+        {% for e in form.consent_given.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}</div>
+      <p class="small text-muted-2 mt-2 mb-0">You can withdraw or permanently delete a record at any time from its page.</p>
+    </div>
+    <button class="btn btn-primary btn-lg" type="submit">Save and continue</button>
+  </form>
+</div>
+{% endblock %}
